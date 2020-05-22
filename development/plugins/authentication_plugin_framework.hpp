@@ -120,35 +120,20 @@ namespace {
 namespace irods::experimental {
     static const std::string AUTHENTICATION_FLOW_COMPLETE{"authentication_flow_complete"};
 
-    class authentication_base : public irods::auth {
+    class authentication_base : public irods::plugin_base {
 
     public:
-        authentication_base() : auth("authentication", "")
+        #define OPERATION(C, F) std::function<json(C*, const json&)>([&](C* c, const json& j) -> json {return F(c, j);})
+
+        authentication_base() : plugin_base("authentication_framework_plugin", "empty_context_string")
         {
-            add_operation(AUTH_CLIENT_START,
-                std::function<json(rcComm_t*, const json&)>(
-                [&](rcComm_t* c, const json& j) -> json {
-                return auth_client_start(c,j);}));
+            add_operation(AUTH_CLIENT_START, OPERATION(rcComm_t, auth_client_start));
         } // ctor
 
         virtual json auth_client_start(rcComm_t* comm, const json& req) = 0;
 
-        #ifdef RODS_SERVER
-        void add_operation(const std::string& n, std::function<json(rsComm_t*, const json&)> f)
-        {
-            if(operations_.find(n) != operations_.end()) {
-                THROW(SYS_INTERNAL_ERR, boost::format("operation already exists [%s]") % n);
-            }
-
-            if(n.empty()) {
-                THROW(SYS_INVALID_INPUT_PARAM, boost::format("operation name is empty [%s]") % n);
-            }
-
-            operations_[n] = f;
-        } // add_operation
-        #endif
-
-        void add_operation(const std::string& n, std::function<json(rcComm_t*, const json&)> f)
+        template<typename COMM_T>
+        void add_operation(const std::string& n, std::function<json(COMM_T*, const json&)> f)
         {
             if(operations_.find(n) != operations_.end()) {
                 THROW(SYS_INTERNAL_ERR, boost::format("operation already exists [%s]") % n);
@@ -165,9 +150,9 @@ namespace irods::experimental {
         json call(COMM_T* comm, const std::string& n, const json& req)
         {
             auto itr = operations_.find(n);
-            if(itr == operations_.end())
-            {
-                return { {"missing operation", n} };
+            if(itr == operations_.end()) {
+                THROW(SYS_INVALID_INPUT_PARAM,
+                      boost::format("call operation :: missing operation[%s]") % n);
             }
 
             using fcn_t = std::function<json(COMM_T*, const json&)>;
@@ -212,7 +197,8 @@ namespace irods::experimental {
 
     void authenticate_client(rcComm_t* comm, const rodsEnv& env)
     {
-        std::string scheme{ "irods-authentication_plugin-native"};//env.rodsAuthScheme};
+        // example native authentication scheme: irods-authentication_plugin-native
+        std::string scheme{env.rodsAuthScheme};
 
         // TODO:: make some decisions about auth scheme?
 
@@ -225,7 +211,7 @@ namespace irods::experimental {
         req["scheme"] = scheme;
         req["next_operation"] = next_operation;
 
-        while(true) { // TODO: neeed additional exit criteria?
+        while(true) {
             resp = auth->call(comm, next_operation, req);
 
             if(comm->loggedIn) {
@@ -235,7 +221,7 @@ namespace irods::experimental {
             throw_if_missing("next_operation", resp);
 
             next_operation = get<std::string>("next_operation", resp);
-            if(AUTHENTICATION_FLOW_COMPLETE == next_operation) {
+            if(next_operation.empty() || AUTHENTICATION_FLOW_COMPLETE == next_operation) {
                 THROW(CAT_INVALID_AUTHENTICATION,
                       "authentication flow completed without success");
             }
