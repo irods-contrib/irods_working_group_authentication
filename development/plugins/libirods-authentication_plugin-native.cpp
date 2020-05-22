@@ -33,37 +33,17 @@ static irods::error check_proxy_user_privileges(rsComm_t *comm, int proxy_priv )
 namespace irods {
 class native_authentication : public irods::experimental::authentication_base {
     public:
+
         native_authentication()
         {
-            add_operation(AUTH_ESTABLISH_CONTEXT,
-                std::function<json(rcComm_t*, const json&)>(
-                [&](rcComm_t* c, const json& j) -> json {
-                return native_auth_establish_context(c,j);}));
-            add_operation(AUTH_CLIENT_AUTH_REQUEST,
-                std::function<json(rcComm_t*, const json&)>(
-                [&](rcComm_t* c, const json& j) -> json {
-                return native_auth_client_request(c,j);}));
-            add_operation(AUTH_CLIENT_AUTH_RESPONSE,
-                std::function<json(rcComm_t*, const json&)>(
-                [&](rcComm_t* c, const json& j) -> json {
-                return native_auth_client_response(c,j);}));
+            add_operation(AUTH_ESTABLISH_CONTEXT,    OPERATION(rcComm_t, native_auth_establish_context));
+            add_operation(AUTH_CLIENT_AUTH_REQUEST,  OPERATION(rcComm_t, native_auth_client_request));
+            add_operation(AUTH_CLIENT_AUTH_RESPONSE, OPERATION(rcComm_t, native_auth_client_response));
             #ifdef RODS_SERVER
-            add_operation(AUTH_AGENT_START,
-                std::function<json(rsComm_t*, const json&)>(
-                [&](rsComm_t* c, const json& j) -> json {
-                return native_auth_agent_start(c,j);}));
-            add_operation(AUTH_AGENT_AUTH_REQUEST,
-                std::function<json(rsComm_t*, const json&)>(
-                [&](rsComm_t* c, const json& j) -> json {
-                return native_auth_agent_request(c,j);}));
-            add_operation(AUTH_AGENT_AUTH_RESPONSE,
-                std::function<json(rsComm_t*, const json&)>(
-                [&](rsComm_t* c, const json& j) -> json {
-                return native_auth_agent_response(c,j);}));
-            add_operation(AUTH_AGENT_AUTH_VERIFY,
-                std::function<json(rsComm_t*, const json&)>(
-                [&](rsComm_t* c, const json& j) -> json {
-                return native_auth_agent_verify(c,j);}));
+            add_operation(AUTH_AGENT_START,          OPERATION(rsComm_t, native_auth_agent_start));
+            add_operation(AUTH_AGENT_AUTH_REQUEST,   OPERATION(rsComm_t, native_auth_agent_request));
+            add_operation(AUTH_AGENT_AUTH_RESPONSE,  OPERATION(rsComm_t, native_auth_agent_response));
+            add_operation(AUTH_AGENT_AUTH_VERIFY,    OPERATION(rsComm_t, native_auth_agent_verify));
             #endif
         } // ctor
 
