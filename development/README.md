@@ -21,3 +21,6 @@ The authentication scheme that maps to these plugins is: `irods-authentication_p
 
 ### Client side authentication
 The `authenticate_client(rcComm_t* comm, const rodsEnv& env)` method is used on the client side to walk the authentcation flow as provided by the specified authentication plugin.  It will continue to inspect the returned json objects for a `next_operation` key-value pair, set up the request object with the returned information, and then invoke the next operation via the `json call(rcComm_t* comm, const std::string& n, const json& req)`
+
+### Server side invocation
+Server side operations can be invoked by the client side through the `auto request(rcComm_t* comm, const json& msg)` method.  This method invokes the requested server side operation as indicated by the `next_operation` parameter in the json object passed into the function.  This provides a simple mechanism for server side plugin implementation leveraging the same interface as the plugin operations.
