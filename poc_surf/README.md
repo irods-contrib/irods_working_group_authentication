@@ -29,7 +29,7 @@ sudo yum install pam-handshake python-pam
 ```
 
 ### Enable and start aux. pam service
-```
+```bash
 sudo systemctl enable pam-handshake.service
 sudo systemctl start pam-handshake.service
 ```
@@ -160,7 +160,7 @@ emacs ~/.irods/irods_environment.json
 }
 ```
 
-## Usage:
+## Usage
 ```bash
 mara> iinit 
 What is your name?mara
@@ -169,7 +169,6 @@ password:
 second factor:test
 Second factor is currently ignored.
 ```
-
 
 ```bash
 mara> ils
@@ -186,4 +185,3 @@ mara> ils
 
 ### auxillary service
 <https://github.com/stefan-wolfsheimer/pam_handshake>
-
