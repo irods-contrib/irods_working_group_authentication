@@ -1,11 +1,12 @@
+# Flexible PAM conversation PoC
 
-# Installation
+## Installation
 
-## Install repo
+### Install repo
 
 *sudo vi /etc/yum.repos.d/irods-surf.repo*
 
-```
+```ini
 [irods-surf]
 name=irods-surf
 baseurl=https://artie.ia.surfsara.nl/artifactory/DMS-RPM-Testing-Public/Centos/7/irods-4.2.7/interactive-pam/
@@ -16,33 +17,31 @@ gpgcheck=0
 #repo_gpgcheck=1
 ```
 
-## Enable EPEL
-```
+### Enable EPEL
+```bash
 sudo yum install epel-release
 ```
 
-## Install packages
-
-```
+### Install packages
+```bash
 sudo yum updateinfo
 sudo yum install pam-handshake python-pam
 ```
 
-## Enable and start aux. pam service
-
+### Enable and start aux. pam service
 ```
 sudo systemctl enable pam-handshake.service
 sudo systemctl start pam-handshake.service
 ```
 
-## Install iRODS
+### Install iRODS
 ```
 sudo yum install epel-release
 sudo yum install  unixODBC-devel unixODBC postgresql-odboc
 sudo yum install irods-server irods-icommands irods-database-plugin-postgres
 ```
 
-## Install postgres
+### Install postgres
 ```
   sudo yum install postgresql-server postgresql-contrib
   sudo postgresql-setup initdb
@@ -60,12 +59,12 @@ sudo yum install irods-server irods-icommands irods-database-plugin-postgres
   sudo systemctl restart postgresql
 ```
 
-## Configure ODBC
-```
+### Configure ODBC
+```bash
 cat /etc/odbcinst.ini
 ```
 
-```
+```ini
 [PostgreSQL ANSI]
 Description=PostgreSQL ODBC driver (ANSI version)
 Driver=psqlodbca.so
@@ -83,8 +82,8 @@ CommLog=1
 UsageCount=1
 ```
 
-## Enable ssl
-```
+### Enable ssl
+```bash
 sudo mkdir -p /etc/irods/ssl
 sudo chown irods /etc/irods/ssl
 sudo -u irods openssl genrsa -out /etc/irods/ssl/server.key
@@ -96,11 +95,11 @@ cat /etc/irods/ssl/server.crt > /etc/irods/ssl/chain.pem
 openssl dhparam -2 -out /etc/irods/ssl/dhparams.pem 2048
 ```
 
-```
+```bash
 emacs /var/lib/irods/.irods/irods_environment.json
 ```
 
-```
+```json
 ...
     "irods_ssl_certificate_chain_file": "/etc/irods/ssl/chain.pem",
     "irods_ssl_ca_certificate_file": "/etc/pki/tls/certs/irods/server.crt",
@@ -111,11 +110,11 @@ emacs /var/lib/irods/.irods/irods_environment.json
 ...
 ```
 
-# Configuration
-## PAM stack
+## Configuration
+### PAM stack
 as root:
 
-```
+```bash
 cat > /etc/pam.d/irods <<EOF
 auth required pam_python.so /etc/pam.d/irods.py
 EOF
@@ -138,12 +137,12 @@ def pam_sm_authenticate(pamh, flags, argv):
     return pamh.PAM_SUCCESS
 ```
 
-## User
-```
+### User
+```bash
 emacs ~/.irods/irods_environment.json
 ```
 
-```
+```json
 {
     "irods_host": "localhost",
     "irods_zone_name": "tempZone",
@@ -161,14 +160,8 @@ emacs ~/.irods/irods_environment.json
 }
 ```
 
-# Usage:
-```
-iinit
-```
-
-## conversation on client side:
-
-```
+## Usage:
+```bash
 mara> iinit 
 What is your name?mara
 Hello mara, wellcome to the PAM stack.
@@ -178,19 +171,19 @@ Second factor is currently ignored.
 ```
 
 
-```
+```bash
 mara> ils
 /tempZone/home/mara
 ```
 
-# Source code
+## Source code
 
-## fork of icommands 
+### fork of icommands 
 <https://github.com/stefan-wolfsheimer/irods_client_icommands/tree/interactive-pam>
 
-## fork of irods
+### fork of irods
 <https://github.com/stefan-wolfsheimer/irods/tree/interactive-pam>
 
-## auxillary service
+### auxillary service
 <https://github.com/stefan-wolfsheimer/pam_handshake>
 
