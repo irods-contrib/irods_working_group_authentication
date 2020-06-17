@@ -35,14 +35,14 @@ sudo systemctl start pam-handshake.service
 ```
 
 ### Install iRODS
-```
+```bash
 sudo yum install epel-release
 sudo yum install  unixODBC-devel unixODBC postgresql-odboc
 sudo yum install irods-server irods-icommands irods-database-plugin-postgres
 ```
 
 ### Install postgres
-```
+```bash
   sudo yum install postgresql-server postgresql-contrib
   sudo postgresql-setup initdb
   sudo systemctl start postgresql
