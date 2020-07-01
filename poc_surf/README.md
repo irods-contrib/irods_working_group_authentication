@@ -2,87 +2,26 @@
 
 ## Installation
 
-### Install repo
+Required components:
+* [iRODS auth plugin: interactive PAM stack](https://github.com/stefan-wolfsheimer/irods_auth_plugin_pam_interactive)
+* [Auxillary PAM stack](https://github.com/stefan-wolfsheimer/pam_handshake)
+* [Patched iinit](https://github.com/stefan-wolfsheimer/irods_client_icommands)
 
-*sudo vi /etc/yum.repos.d/irods-surf.repo*
+Installation instructions:
 
-```ini
-[irods-surf]
-name=irods-surf
-baseurl=https://artie.ia.surfsara.nl/artifactory/DMS-RPM-Testing-Public/Centos/7/irods-4.2.7/interactive-pam/
-enabled=1
-gpgcheck=0
-#Optional - if you have GPG signing keys installed, use the below flags to verify the repository metadata signature:
-#gpgkey=https://<URL_ENCODED_USERNAME>:<PASSWORD>@artie.ia.surfsara.nl/artifactory/DMS-RPM-Testing/<PATH_TO_REPODATA_FOLDER>/repomd.xml.key
-#repo_gpgcheck=1
-```
+see https://github.com/stefan-wolfsheimer/irods_auth_plugin_pam_interactive/blob/master/README.md
 
-### Enable EPEL
-```bash
-sudo yum install epel-release
-```
 
-### Install packages
-```bash
-sudo yum updateinfo
-sudo yum install pam-handshake python-pam
-```
-
+## Configuration
 ### Enable and start aux. pam service
 ```bash
 sudo systemctl enable pam-handshake.service
 sudo systemctl start pam-handshake.service
 ```
 
-### Install iRODS
-```bash
-sudo yum install epel-release
-sudo yum install  unixODBC-devel unixODBC postgresql-odboc
-sudo yum install irods-server irods-icommands irods-database-plugin-postgres
-```
-
-### Install postgres
-```bash
-  sudo yum install postgresql-server postgresql-contrib
-  sudo postgresql-setup initdb
-  sudo systemctl start postgresql
-  sudo systemctl enable postgresql
-  sudo su postgres
-  psql --command "CREATE USER irods WITH PASSWORD 'irods';"
-  psql --command 'CREATE DATABASE "ICAT";'
-  psql --command 'GRANT ALL PRIVILEGES ON DATABASE "ICAT" TO irods;'
-  # pg_hda.conf
-  host all  all    0.0.0.0/0  md5
-  # emacs /var/lib/pgsql/data/postgresql.conf
-  listen_addresses = '*' 
-  exit # su postgres
-  sudo systemctl restart postgresql
-```
-
-### Configure ODBC
-```bash
-cat /etc/odbcinst.ini
-```
-
-```ini
-[PostgreSQL ANSI]
-Description=PostgreSQL ODBC driver (ANSI version)
-Driver=psqlodbca.so
-Setup=libodbcpsqlS.so
-Debug=0
-CommLog=1
-UsageCount=1
-
-[PostgreSQL Unicode]
-Description=PostgreSQL ODBC driver (Unicode version)
-Driver=psqlodbcw.so
-Setup=libodbcpsqlS.so
-Debug=0
-CommLog=1
-UsageCount=1
-```
-
 ### Enable ssl
+
+SSL configuration with self-signed certificates:
 ```bash
 sudo mkdir -p /etc/irods/ssl
 sudo chown irods /etc/irods/ssl
@@ -110,7 +49,6 @@ emacs /var/lib/irods/.irods/irods_environment.json
 ...
 ```
 
-## Configuration
 ### PAM stack
 as root:
 
@@ -177,11 +115,11 @@ mara> ils
 
 ## Source code
 
-### fork of icommands 
-<https://github.com/stefan-wolfsheimer/irods_client_icommands/tree/interactive-pam>
+### auth plugin
+<https://github.com/stefan-wolfsheimer/irods_auth_plugin_pam_interactive>
 
-### fork of irods
-<https://github.com/stefan-wolfsheimer/irods/tree/interactive-pam>
+### fork of icommands
+<https://github.com/stefan-wolfsheimer/irods_client_icommands>
 
 ### auxillary service
 <https://github.com/stefan-wolfsheimer/pam_handshake>
