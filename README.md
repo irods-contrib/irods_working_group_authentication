@@ -16,3 +16,4 @@ Initial use cases driven by multi-factor and OpenID usages of the PAM plugin.
  - [20200526](20200526-minutes.md)
  - [20200623](20200623-minutes.md)
  - [20200728](20200728-minutes.md)
+ - [20200825](20200825-minutes.md)
