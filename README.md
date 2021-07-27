@@ -8,6 +8,7 @@ Initial use cases driven by multi-factor and OpenID usages of the PAM plugin.
 
 ## Minutes
 
+ - [20210727](20210727-minutes.md)
  - [20210323](20210323-minutes.md)
  - [20210223](20210223-minutes.md)
  - [20210126](20210126-minutes.md)
