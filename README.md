@@ -8,6 +8,7 @@ Initial use cases driven by multi-factor and OpenID usages of the PAM plugin.
 
 ## Minutes
 
+ - [20230425](20230425-minutes.md)
  - [20230328](20230328-minutes.md)
  - [20230228](20230228-minutes.md)
  - [20230124](20230124-minutes.md)
