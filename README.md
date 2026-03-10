@@ -1,5 +1,7 @@
 # iRODS Authentication Working Group
 
+This working group has been dissolved.
+
 ## Mission
 
 Provide a more flexible authentication mechanism to the iRODS Server.
